@@ -1,5 +1,6 @@
 package com.example.rqchallenge.employees;
 
+import com.example.rqchallenge.dummyRestApi.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/employees")
@@ -25,11 +27,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<List<Employee>> getAllEmployees() throws IOException {
-        try {
-            return new ResponseEntity<>(employeeService.getAllEmployees(), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+        return Optional.ofNullable(employeeService.getAllEmployees())
+                .map(employees -> new ResponseEntity<>(employees, HttpStatus.OK))
+                .orElseThrow(RuntimeException::new);
     }
 
     /**
@@ -40,7 +40,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        return new ResponseEntity<>(employeeService.getEmployeesByNameSearch(searchString), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.getEmployeesByNameSearch(searchString))
+                .map(employees -> new ResponseEntity<>(employees, HttpStatus.OK))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -51,7 +53,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<Employee> getEmployeeById(String id) {
-        return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.getEmployeeById(id))
+                .map(employee -> new ResponseEntity<>(employee, HttpStatus.OK))
+                .orElse( ResponseEntity.internalServerError().build());
     }
 
     /**
@@ -61,7 +65,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
-        return new ResponseEntity<>(employeeService.getHighestSalaryOfEmployees(), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.getHighestSalaryOfEmployees())
+                .map(salary -> new ResponseEntity<>(salary, HttpStatus.OK))
+                .orElse( ResponseEntity.internalServerError().build());
     }
 
     /**
@@ -71,7 +77,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
-        return new ResponseEntity<>(employeeService.getTop10HighestEarningEmployeeNames(), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.getTop10HighestEarningEmployeeNames())
+                .map(employeeNames -> new ResponseEntity<>(employeeNames, HttpStatus.OK))
+                .orElse( ResponseEntity.internalServerError().build());
     }
 
     /**
@@ -82,10 +90,12 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<String> createEmployee(Map<String, Object> employeeInput) {
-        return new ResponseEntity<>(employeeService.createEmployee(
-                employeeInput.get("name").toString(),
-                employeeInput.get("salary").toString(),
-                employeeInput.get("age").toString()), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.createEmployee(EmployeeMapper.toEmployee(employeeInput)))
+                .map(status ->
+                    status == "success"
+                    ? new ResponseEntity<>(status, HttpStatus.OK)
+                    : new ResponseEntity<>(status, HttpStatus.BAD_REQUEST))
+                .orElse( ResponseEntity.internalServerError().build());
     }
 
     /**
@@ -96,6 +106,9 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return new ResponseEntity<>(employeeService.deleteEmployee(id), HttpStatus.OK);
+        return Optional.ofNullable(employeeService.getEmployeeById(id)).map(foundEmployee -> {
+            employeeService.deleteEmployee(foundEmployee.getId());
+            return new ResponseEntity<>(foundEmployee.getName(), HttpStatus.OK);
+        }).orElse( ResponseEntity.notFound().build());
     }
 }
