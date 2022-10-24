@@ -9,6 +9,6 @@ public interface IEmployeeService {
     public Employee getEmployeeById(String id);
     public Integer getHighestSalaryOfEmployees();
     public List<String> getTop10HighestEarningEmployeeNames();
-    public String createEmployee(String name, String salary, String age);
+    public String createEmployee(Employee employee);
     public String deleteEmployee(String id);
 }

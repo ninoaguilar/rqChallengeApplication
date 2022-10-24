@@ -4,9 +4,12 @@ import com.example.rqchallenge.dummyRestApi.models.CreateResponse;
 import com.example.rqchallenge.dummyRestApi.models.EmployeesResponse;
 import com.example.rqchallenge.employees.Employee;
 import com.google.common.collect.ImmutableMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 @Service
 public class DummyRestApiService {
@@ -23,13 +26,15 @@ public class DummyRestApiService {
             EndpointLabels.CREATE_EMPLOYEE, BASE_URL + "/v1/create",
             EndpointLabels.DELETE_EMPLOYEE, BASE_URL + "/v1/delete"
     );
-    private final RestTemplate restTemplate;
 
+    private RestTemplate restTemplate;
+
+    @Autowired
     public DummyRestApiService (RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public EmployeesResponse getEmployees() {
+    public EmployeesResponse getEmployees() throws IOException {
         return restTemplate.getForObject(endpoints.get(EndpointLabels.EMPLOYEE), EmployeesResponse.class);
     }
 

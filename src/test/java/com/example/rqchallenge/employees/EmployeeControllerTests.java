@@ -1,6 +1,8 @@
 package com.example.rqchallenge.employees;
 
+import com.example.rqchallenge.dummyRestApi.EmployeeMapper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static com.example.rqchallenge.employees.EmployeeTestData.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,13 +38,6 @@ class EmployeeControllerTests {
 
     @BeforeAll
     public static void setup() {
-        final Employee employee1 = Employee.of("Steve Jobs", "77777", "56");
-        final Employee employee2 = Employee.of("Bruce Wayne", "1234567", "32");
-        final Employee employee3 = Employee.of("Bruce Wine", "1234567", "25");
-        final Employee employee4 = Employee.of("Micheal Jordan", "232323", "65");
-        final Employee employee5 = Employee.of("Michelle Jordan", "55555", "77");
-        final Employee employee6 = Employee.of("Eminem", "9876543", "50");
-
         employees = ImmutableList.of(employee1, employee2, employee3, employee4, employee5, employee6);
     }
 
@@ -56,14 +53,14 @@ class EmployeeControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(6)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Steve Jobs"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].salary").value("77777"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].age").value("56"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Bruce Wayne"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value("Bruce Wine"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[3].name").value("Micheal Jordan"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[4].name").value("Michelle Jordan"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[5].name").value("Eminem"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(employee1.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].salary").value(employee1.getSalary()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].age").value(employee1.getAge()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value(employee2.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value(employee3.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[3].name").value(employee4.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[4].name").value(employee5.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[5].name").value(employee6.getName()));
     }
 
     @Test
@@ -113,7 +110,7 @@ class EmployeeControllerTests {
 
     @Test
     void getTop10HighestEarningEmployeeNames_Successfully() throws Exception {
-        Mockito.when(employeeService.getTop10HighestEarningEmployeeNames()).thenReturn(employees.stream().map(employee -> employee.getName()).toList());
+        Mockito.when(employeeService.getTop10HighestEarningEmployeeNames()).thenReturn(employees.stream().map(Employee::getName).toList());
 
         mockMvc.perform(
                         MockMvcRequestBuilders
@@ -127,7 +124,9 @@ class EmployeeControllerTests {
 
     @Test
     void createEmployee_Successfully() throws Exception {
-        Mockito.when(employeeService.createEmployee("test", "1000", "25")).thenReturn("success");
+        ImmutableMap<String, Object> employeeInput = ImmutableMap.of("name", "test", "salary", "1000", "age", "25");
+
+        Mockito.when(employeeService.createEmployee(EmployeeMapper.toEmployee(employeeInput))).thenReturn("success");
 
         mockMvc.perform(
                         MockMvcRequestBuilders
@@ -143,6 +142,7 @@ class EmployeeControllerTests {
     @Test
     void deleteEmployee_Successfully() throws Exception {
         Mockito.when(employeeService.deleteEmployee("1")).thenReturn("name");
+        Mockito.when(employeeService.getEmployeeById("1")).thenReturn(Employee.of("bob", "1", "1"));
 
         mockMvc.perform(
                         MockMvcRequestBuilders
@@ -150,6 +150,6 @@ class EmployeeControllerTests {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").value("name"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value("bob"));
     }
 }
