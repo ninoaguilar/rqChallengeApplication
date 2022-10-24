@@ -64,6 +64,18 @@ public class Employee implements Serializable {
         return employee;
     }
 
+    public static Employee of(String id, String name, String salary, String age, String profilePicture) {
+        Employee employee = new Employee();
+
+        employee.id = id;
+        employee.name = name;
+        employee.salary = salary;
+        employee.age = age;
+        employee.profilePicture = profilePicture;
+
+        return employee;
+    }
+
     @Override
     public String toString() {
         return "Employee{" +

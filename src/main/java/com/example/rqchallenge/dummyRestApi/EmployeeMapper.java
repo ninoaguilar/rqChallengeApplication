@@ -14,6 +14,11 @@ public class EmployeeMapper {
     }
 
     public static Employee toEmployee(DummyEmployee dummyEmployee) {
-        return Employee.of(dummyEmployee.employee_name, dummyEmployee.employee_salary, dummyEmployee.employee_age);
+        return Employee.of(
+                dummyEmployee.id,
+                dummyEmployee.employee_name,
+                dummyEmployee.employee_salary,
+                dummyEmployee.employee_age,
+                dummyEmployee.profile_image);
     }
 }
