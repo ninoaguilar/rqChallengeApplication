@@ -124,16 +124,13 @@ class EmployeeControllerTests {
 
     @Test
     void createEmployee_Successfully() throws Exception {
-        ImmutableMap<String, Object> employeeInput = ImmutableMap.of("name", "test", "salary", "1000", "age", "25");
-
-        Mockito.when(employeeService.createEmployee(EmployeeMapper.toEmployee(employeeInput))).thenReturn("success");
+        Mockito.when(employeeService.createEmployee(Mockito.any())).thenReturn("success");
 
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .post("/v1/employees")
                                 .content("{ \"name\": \"test\", \"salary\": \"1000\", \"age\": \"25\"}")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").value("success"));
