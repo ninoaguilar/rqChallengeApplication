@@ -1,3 +1,8 @@
+# TODO
+* Implement API logging and error logging
+* Implement custom error catching
+* Update test
+
 # Coding Challenge
 
 ### In this assessment you will be tasked with filling out the functionality of different methods that will be listed further down.
