@@ -127,27 +127,29 @@ class EmployeeControllerTests {
 
     @Test
     void createEmployee_Successfully() throws Exception {
-        Mockito.when(employeeService.createEmployee("name", "1", "1")).thenReturn("success");
+        Mockito.when(employeeService.createEmployee("test", "1000", "25")).thenReturn("success");
 
         mockMvc.perform(
                         MockMvcRequestBuilders
-                                .post("/v1/employees", Employee.of("name", "1", "1"))
+                                .post("/v1/employees")
+                                .content("{ \"name\": \"test\", \"salary\": \"1000\", \"age\": \"25\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").value("success"));
     }
 
     @Test
     void deleteEmployee_Successfully() throws Exception {
-        Mockito.when(employeeService.deleteEmployee("id")).thenReturn("name");
+        Mockito.when(employeeService.deleteEmployee("1")).thenReturn("name");
 
         mockMvc.perform(
                         MockMvcRequestBuilders
-                                .delete("/v1/employees/1")
+                                .delete("/v1/employees/{id}", "1")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value("name"));
     }
 }
