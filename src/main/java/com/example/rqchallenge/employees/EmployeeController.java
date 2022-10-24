@@ -65,7 +65,7 @@ public class EmployeeController implements IEmployeeController {
     }
 
     /**
-     * Returns a list of the top 10 employees based off of their salaries.
+     * Returns a list names of the top 10 employees based off of their salaries.
      *
      * @return list of employees
      */
@@ -82,7 +82,10 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<String> createEmployee(Map<String, Object> employeeInput) {
-        return ResponseEntity.ok("success");
+        return new ResponseEntity<>(employeeService.createEmployee(
+                employeeInput.get("name").toString(),
+                employeeInput.get("salary").toString(),
+                employeeInput.get("age").toString()), HttpStatus.OK);
     }
 
     /**
@@ -93,6 +96,6 @@ public class EmployeeController implements IEmployeeController {
      */
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return null;
+        return new ResponseEntity<>(employeeService.deleteEmployee(id), HttpStatus.OK);
     }
 }

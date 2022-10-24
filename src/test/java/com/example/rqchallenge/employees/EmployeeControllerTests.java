@@ -8,22 +8,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Optional;
-
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@WebMvcTest(controllers = EmployeeController.class)
+@Import(EmployeeController.class)
 class EmployeeControllerTests {
     @Autowired
     MockMvc mockMvc;
@@ -110,5 +109,45 @@ class EmployeeControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").value(9876543));
+    }
+
+    @Test
+    void getTop10HighestEarningEmployeeNames_Successfully() throws Exception {
+        Mockito.when(employeeService.getTop10HighestEarningEmployeeNames()).thenReturn(employees.stream().map(employee -> employee.getName()).toList());
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get("/v1/employees/topTenHighestEarningEmployeeNames")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(6)));
+    }
+
+    @Test
+    void createEmployee_Successfully() throws Exception {
+        Mockito.when(employeeService.createEmployee("name", "1", "1")).thenReturn("success");
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .post("/v1/employees", Employee.of("name", "1", "1"))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value("success"));
+    }
+
+    @Test
+    void deleteEmployee_Successfully() throws Exception {
+        Mockito.when(employeeService.deleteEmployee("id")).thenReturn("name");
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .delete("/v1/employees/1")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
