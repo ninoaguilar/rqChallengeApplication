@@ -1,4 +1,4 @@
-package com.example.rqchallenge.dummyRestApi;
+package com.example.rqchallenge.dummyRestApi.models;
 
 import java.util.List;
 
@@ -7,12 +7,3 @@ public class EmployeesResponse {
     public List<DummyEmployee> data;
 }
 
-public class EmployeeResponse {
-    public String status;
-    public DummyEmployee data;
-}
-
-public class CreateResponse {
-    public String status;
-    public DummyCreatedEmployee data;
-}

@@ -1,4 +1,4 @@
-package com.example.rqchallenge.dummyRestApi;
+package com.example.rqchallenge.dummyRestApi.models;
 
 public class DummyEmployee {
     public String id;
